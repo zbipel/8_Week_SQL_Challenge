@@ -2,16 +2,20 @@
 -- 1. What is the total amount each customer spent at the restaurant?
 
 
-SELECT customer_id, SUM(price) AS 'Total amount spent'
+SELECT 
+	customer_id, 
+	SUM(price) AS 'Total amount spent'
 FROM sales s
-LEFT JOIN menu m on s.product_id = m.product_id
+	LEFT JOIN menu m on s.product_id = m.product_id
 GROUP BY customer_id;
 
 
 -- 2. How many days has each customer visited the restaurant?
 
 
-SELECT customer_id, COUNT(DISTINCT order_date) AS visit_days
+SELECT 
+	customer_id, 
+	COUNT(DISTINCT order_date) AS visit_days
 FROM sales s
 GROUP BY customer_id;
 
@@ -25,7 +29,7 @@ SELECT
 	product_name,
 	RANK() OVER (PARTITION BY customer_id ORDER BY order_date) AS rank
 FROM sales s
-JOIN  menu m ON m.product_id = S.product_id
+	JOIN  menu m ON m.product_id = S.product_id
 )
 
 SELECT 
@@ -61,7 +65,7 @@ SELECT
 	COUNT(s.product_id) AS orders,
 	RANK() OVER( PARTITION BY customer_id ORDER BY COUNT(s.product_id) DESC) AS rank
 FROM sales s
-LEFT JOIN  menu m ON m.product_id = S.product_id
+	LEFT JOIN  menu m ON m.product_id = S.product_id
 GROUP BY 
 	customer_id,
 	product_name
@@ -84,8 +88,8 @@ SELECT
 	men.product_name,
 	RANK() OVER (PARTITION BY s.customer_id ORDER BY s.order_date) AS rank
 FROM sales s
-JOIN members m  ON m.customer_id = s.customer_id
-JOIN menu men ON men.product_id = s.product_id
+	JOIN members m  ON m.customer_id = s.customer_id
+	JOIN menu men ON men.product_id = s.product_id
 WHERE s.order_date >= m.join_date
 )
 
@@ -106,7 +110,7 @@ SELECT
 	product_id,
 	RANK() OVER( PARTITION BY s.customer_id ORDER BY s.order_date DESC) AS rank
 FROM sales s
-JOIN members m ON m.customer_id = s.customer_id
+	JOIN members m ON m.customer_id = s.customer_id
 WHERE order_date < join_date
 )
 
@@ -142,7 +146,7 @@ SELECT
 		ELSE price * 10
 	END) AS points
 FROM sales s
-LEFT JOIN menu m ON m.product_id = s.product_id
+	LEFT JOIN menu m ON m.product_id = s.product_id
 GROUP BY customer_id;
 
 
@@ -152,9 +156,11 @@ GROUP BY customer_id;
 
 SELECT
 	s.customer_id,
-	SUM(CASE
-			WHEN order_date >= join_date AND order_date < DATEADD(DAY, 7, join_date) THEN price * 20 
-			ELSE price END) AS points
+	SUM(
+	CASE
+		WHEN order_date >= join_date AND order_date < DATEADD(DAY, 7, join_date) THEN price * 20 
+		ELSE price 
+	END) AS points
 FROM sales s
 	JOIN members m ON s.customer_id = m.customer_id
 	JOIN menu men ON men.product_id = s.product_id
